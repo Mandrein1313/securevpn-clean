@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ด — SecureVPN</title>
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body class="portal">
+  <div class="portal-wrap">
+    <div class="top-nav">
+      <strong>SecureVPN</strong>
+      <span class="muted" id="userLabel">...</span>
+    </div>
+
+    <div class="credit-card">
+      <div>
+        <div class="label">ยอดเครดิตของฉัน</div>
+        <div class="bal" id="balText">฿0.00</div>
+      </div>
+      <div class="emoji">😊</div>
+    </div>
+
+    <div class="menu-list">
+      <a class="menu-item home" href="index.html">
+        <div class="ico">🏠</div>
+        <div><div class="txt">หน้าแรก</div><div class="sub">เว็บไซต์หลัก</div></div>
+      </a>
+      <a class="menu-item top" href="topup.html">
+        <div class="ico">💳</div>
+        <div><div class="txt">เติมเงิน</div><div class="sub">โอนธนาคาร / TrueMoney</div></div>
+      </a>
+      <a class="menu-item pkg" href="packages.html">
+        <div class="ico">📦</div>
+        <div><div class="txt">แพ็กเกจ</div><div class="sub">ซื้อด้วยเครดิต</div></div>
+      </a>
+      <a class="menu-item hist" href="history.html">
+        <div class="ico">🕐</div>
+        <div><div class="txt">ประวัติการซื้อ</div><div class="sub">รายการแพ็กและรหัส VPN</div></div>
+      </a>
+      <a class="menu-item out" href="#" id="btnLogout">
+        <div class="ico">🚪</div>
+        <div><div class="txt">ออกจากระบบ</div></div>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/wallet-store.js"></script>
+  <script>
+    (function () {
+      function displayName(user) {
+        if (!user) return "";
+        var m = user.user_metadata || {};
+        if (m.username) return m.username;
+        var e = user.email || "";
+        var i = e.indexOf("@");
+        return i > 0 ? e.slice(0, i) : e;
+      }
+
+      async function boot() {
+        var s = await Store.getSession();
+        if (!s || !s.user) {
+          location.href = "login.html";
+          return;
+        }
+        document.getElementById("userLabel").textContent = displayName(s.user);
+        document.getElementById("btnLogout").onclick = async function (e) {
+          e.preventDefault();
+          await Store.logout();
+          location.href = "login.html";
+        };
+        try {
+          var w = await Store.getWallet();
+          document.getElementById("balText").textContent =
+            "฿" + Number(w.balance).toFixed(2);
+        } catch (err) {
+          document.getElementById("balText").textContent = "—";
+          console.error(err);
+        }
+      }
+      boot();
+    })();
+  </script>
+</body>
+</html>

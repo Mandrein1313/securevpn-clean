@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ — SecureVPN</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body.auth-page {
+      min-height: 100vh;
+      margin: 0;
+      background: radial-gradient(ellipse at top, #1a2240 0%, #0b0f1a 55%);
+      color: #e8ecf4;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .gate {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .8rem;
+      color: #86efac;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.08);
+      padding: .45rem .85rem;
+      border-radius: 999px;
+    }
+    .status-bar .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 8px #22c55e;
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(22, 28, 45, .92);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 1.6rem 1.4rem 1.4rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+    }
+    .card h1 { margin: 0 0 .35rem; font-size: 1.35rem; text-align: center; }
+    .card .sub { text-align: center; color: #9aa3b5; font-size: .9rem; margin: 0 0 1.2rem; }
+    .tabs {
+      display: flex; gap: .4rem; margin-bottom: 1rem;
+      background: rgba(0,0,0,.25); padding: .3rem; border-radius: 999px;
+    }
+    .tabs button {
+      flex: 1; border: 0; background: transparent; color: #9aa3b5;
+      padding: .5rem; border-radius: 999px; cursor: pointer; font-weight: 600;
+    }
+    .tabs button.active { background: #e11d48; color: #fff; }
+    label { display: block; font-size: .85rem; color: #c5cddc; margin-bottom: .85rem; }
+    input[type="text"], input[type="password"] {
+      width: 100%; margin-top: .35rem; box-sizing: border-box;
+      padding: .75rem .9rem; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0a0e18; color: #fff; font-size: 1rem;
+    }
+    .row-opts {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .82rem; color: #9aa3b5; margin: .2rem 0 1rem;
+    }
+    .row-opts label { display: flex; align-items: center; gap: .4rem; margin: 0; cursor: pointer; }
+    .btn-main {
+      width: 100%; border: 0; border-radius: 12px; padding: .85rem;
+      font-size: 1rem; font-weight: 700; color: #fff;
+      background: linear-gradient(180deg, #f43f5e, #e11d48); cursor: pointer;
+    }
+    .btn-main:disabled { opacity: .6; cursor: wait; }
+    .msg-err { color: #f87171; font-size: .85rem; min-height: 1.2em; margin-top: .65rem; text-align: center; }
+    .msg-ok { color: #4ade80; font-size: .85rem; margin-top: .5rem; text-align: center; }
+    .foot { text-align: center; margin-top: 1rem; font-size: .88rem; color: #9aa3b5; }
+    .foot a { color: #fda4af; font-weight: 600; text-decoration: none; }
+    .brand { margin-top: .5rem; font-size: .75rem; color: #64748b; text-align: center; }
+  </style>
+</head>
+<body class="auth-page">
+  <div class="gate">
+    <div class="status-bar">
+      <span class="dot"></span>
+      เกตเวย์พร้อมเชื่อมต่อ · AES-256
+    </div>
+
+    <div class="card">
+      <h1>เข้าสู่ระบบ</h1>
+      <p class="sub">ยืนยันตัวตนเพื่อเริ่มใช้งานบริการ</p>
+
+      <div class="tabs">
+        <button type="button" class="active" id="tabLogin">เข้าสู่ระบบ</button>
+        <button type="button" id="tabRegister">สมัครสมาชิก</button>
+      </div>
+
+      <form id="authForm" autocomplete="on">
+        <label>ชื่อผู้ใช้
+          <input type="text" id="username" required autocomplete="username"
+                 placeholder="ชื่อผู้ใช้" pattern="[A-Za-z0-9_]{3,32}"
+                 title="ใช้ a-z, 0-9, _ ความยาว 3–32 ตัว">
+        </label>
+        <label>รหัสผ่าน
+          <input type="password" id="password" required autocomplete="current-password"
+                 placeholder="รหัสผ่าน" minlength="6">
+        </label>
+
+        <div class="row-opts">
+          <label><input type="checkbox" id="remember" checked> จำฉันไว้</label>
+          <span></span>
+        </div>
+
+        <button type="submit" class="btn-main" id="btnSubmit">เข้าสู่ระบบ</button>
+        <p class="msg-err" id="authError"></p>
+        <p class="msg-ok" id="authOk"></p>
+      </form>
+
+      <div class="foot" id="footHint">
+        ยังไม่มีบัญชี? <a href="#" id="linkSwitch">สมัครสมาชิก</a>
+      </div>
+    </div>
+
+    <p class="brand">SecureVPN · เก็บ Log ตามกฎหมายไทย</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script>
+    (function () {
+      // ชื่อผู้ใช้ → อีเมลจำลอง (ลูกค้าไม่ต้องกรอกอีเมล)
+      var DOMAIN = "customer.securevpn.local";
+      function toEmail(username) {
+        return String(username || "").trim().toLowerCase() + "@" + DOMAIN;
+      }
+      function normalizeUser(u) {
+        return String(u || "").trim().toLowerCase();
+      }
+
+      var mode = "login";
+      var tabLogin = document.getElementById("tabLogin");
+      var tabRegister = document.getElementById("tabRegister");
+      var btn = document.getElementById("btnSubmit");
+      var err = document.getElementById("authError");
+      var ok = document.getElementById("authOk");
+
+      function bindSwitch() {
+        var el = document.getElementById("linkSwitch");
+        if (!el) return;
+        el.onclick = function (e) {
+          e.preventDefault();
+          setMode(mode === "login" ? "register" : "login");
+        };
+      }
+
+      function setMode(m) {
+        mode = m;
+        tabLogin.classList.toggle("active", m === "login");
+        tabRegister.classList.toggle("active", m === "register");
+        btn.textContent = m === "login" ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
+        document.getElementById("footHint").innerHTML = m === "login"
+          ? 'ยังไม่มีบัญชี? <a href="#" id="linkSwitch">สมัครสมาชิก</a>'
+          : 'มีบัญชีแล้ว? <a href="#" id="linkSwitch">เข้าสู่ระบบ</a>';
+        bindSwitch();
+        err.textContent = "";
+        ok.textContent = "";
+      }
+      tabLogin.onclick = function () { setMode("login"); };
+      tabRegister.onclick = function () { setMode("register"); };
+      bindSwitch();
+
+      try {
+        var saved = localStorage.getItem("svpn_username");
+        if (saved) document.getElementById("username").value = saved;
+      } catch (e) {}
+
+      // ล็อกอินอยู่แล้ว → ไปหน้าบัญชี
+      if (window.Store) {
+        Store.getSession().then(function (s) {
+          if (s && s.user) location.href = "dashboard.html";
+        }).catch(function () {});
+      }
+
+      document.getElementById("authForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        err.textContent = "";
+        ok.textContent = "";
+
+        var username = normalizeUser(document.getElementById("username").value);
+        var password = document.getElementById("password").value;
+
+        if (!/^[a-z0-9_]{3,32}$/.test(username)) {
+          err.textContent = "ชื่อผู้ใช้ใช้ได้เฉพาะ a-z, 0-9, _ ความยาว 3–32 ตัว";
+          return;
+        }
+        if (password.length < 6) {
+          err.textContent = "รหัสผ่านอย่างน้อย 6 ตัว";
+          return;
+        }
+
+        var email = toEmail(username);
+        btn.disabled = true;
+
+        try {
+          var sb = Store.getClient();
+
+          if (document.getElementById("remember").checked) {
+            try { localStorage.setItem("svpn_username", username); } catch (e2) {}
+          } else {
+            try { localStorage.removeItem("svpn_username"); } catch (e3) {}
+          }
+
+          if (mode === "register") {
+            var res = await sb.auth.signUp({
+              email: email,
+              password: password,
+              options: { data: { username: username, display_name: username } }
+            });
+            if (res.error) throw res.error;
+
+            if (res.data.session) {
+              ok.textContent = "สมัครสำเร็จ";
+              setTimeout(function () { location.href = "dashboard.html"; }, 500);
+            } else {
+              var loginTry = await sb.auth.signInWithPassword({ email: email, password: password });
+              if (loginTry.error) {
+                ok.textContent = "สมัครแล้ว กรุณาเข้าสู่ระบบ";
+                setMode("login");
+              } else {
+                location.href = "dashboard.html";
+              }
+            }
+          } else {
+            var res2 = await sb.auth.signInWithPassword({ email: email, password: password });
+            if (res2.error) throw res2.error;
+            location.href = "dashboard.html";
+          }
+        } catch (ex) {
+          var msg = ex.message || "ไม่สำเร็จ";
+          if (/Invalid login/i.test(msg)) msg = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+          if (/already registered|already been registered/i.test(msg)) msg = "ชื่อผู้ใช้นี้ถูกใช้แล้ว";
+          if (/Email not confirmed/i.test(msg)) msg = "บัญชียังไม่พร้อม — ปิด Confirm email ใน Supabase";
+          err.textContent = msg;
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

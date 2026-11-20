@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureVPN Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <h1>Secure<span>VPN</span> Admin</h1>
+      <p>เข้าสู่ระบบด้วยอีเมลแอดมิน (Supabase Auth)</p>
+      <label>อีเมล
+        <input type="email" id="adminEmail" autocomplete="username" placeholder="you@email.com">
+      </label>
+      <label>รหัสผ่าน
+        <input type="password" id="adminPassword" autocomplete="current-password" placeholder="รหัสผ่าน">
+      </label>
+      <button type="button" class="btn btn-block" id="btnLogin">เข้าสู่ระบบ</button>
+      <p class="login-hint">สร้าง user ที่ Supabase → Authentication → Users แล้วใส่ UUID ในตาราง <code>admin_users</code></p>
+      <p id="loginError" class="error"></p>
+      <p style="margin-top:1rem;"><a href="index.html">← หน้าลูกค้า</a></p>
+    </div>
+  </div>
+
+  <div id="dashScreen" class="dash hidden">
+    <header class="admin-header">
+      <div class="container admin-nav">
+        <strong>SecureVPN Admin</strong>
+        <div class="admin-tabs">
+          <button type="button" class="tab-btn active" data-tab="orders">ออเดอร์</button>
+          <button type="button" class="tab-btn" data-tab="logs">Connection Log</button>
+          <button type="button" class="tab-btn" data-tab="abuse">Abuse</button>
+        </div>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-sm btn-outline" id="btnExport">Export</button>
+          <a href="index.html" class="btn btn-sm btn-outline">เว็บลูกค้า</a>
+          <button type="button" class="btn btn-sm btn-outline" id="btnLogout">ออก</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container admin-main">
+      <section id="tab-orders">
+        <div class="panel-note">
+          ข้อมูลอยู่บน Supabase · เฉพาะบัญชีใน <code>admin_users</code> ที่อ่าน/แก้ได้
+          ลูกค้าทั่วไปเพิ่มออเดอร์ได้อย่างเดียว
+        </div>
+        <div class="stats" id="orderStats"></div>
+        <div class="toolbar">
+          <h2>รายการออเดอร์</h2>
+          <div class="toolbar-right">
+            <select id="filterOrderStatus">
+              <option value="all">ทุกสถานะ</option>
+              <option value="pending">รอชำระ</option>
+              <option value="paid">ชำระแล้ว</option>
+              <option value="active">เปิดใช้แล้ว</option>
+              <option value="suspended">ระงับ</option>
+              <option value="cancelled">ยกเลิก</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>รหัส</th><th>ลูกค้า</th><th>แพ็ก</th><th>สถานะ</th><th>เวลา</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="orderBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-logs" class="hidden">
+        <div class="panel-note">
+          Connection Log ตามแนวทางเก็บอย่างน้อย 90 วัน — บนระบบจริงควรส่งจาก VPN server อัตโนมัติ
+        </div>
+        <div class="toolbar">
+          <h2>Connection Log</h2>
+          <div class="toolbar-right">
+            <input type="search" id="logSearch" placeholder="ค้นหา IP / บัญชี / รหัส">
+            <button type="button" class="btn btn-sm" id="btnAddLog">+ เพิ่ม Log</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>รหัส</th><th>บัญชี</th><th>Client IP</th><th>Server</th><th>เริ่ม</th><th>สิ้นสุด</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="tab-abuse" class="hidden">
+        <div class="panel-note">บันทึก Abuse แล้วผูกบัญชี / ระงับเมื่อจำเป็น</div>
+        <div class="toolbar">
+          <h2>รายการ Abuse</h2>
+          <div class="toolbar-right">
+            <button type="button" class="btn btn-sm" id="btnAddAbuse">+ บันทึกเรื่อง</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>รหัส</th><th>แหล่ง</th><th>บัญชีเกี่ยวข้อง</th><th>สถานะ</th><th>เวลา</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="abuseBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modalTitle">รายละเอียด</h3>
+        <button type="button" class="icon-btn" id="modalClose">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" id="btnModalDelete">ลบ</button>
+        <button type="button" class="btn" id="btnModalSave">บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

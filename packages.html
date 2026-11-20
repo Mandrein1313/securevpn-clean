@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แพ็กเกจ — SecureVPN</title>
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body class="portal">
+  <div class="portal-wrap">
+    <div class="top-nav">
+      <a href="dashboard.html">← แดชบอร์ด</a>
+      <span class="muted" id="balMini">฿0</span>
+    </div>
+    <div class="page-title">📦 แพ็กเกจ</div>
+    <p class="muted" style="margin-top:-.5rem;margin-bottom:1rem">ซื้อด้วยเครดิตในบัญชี — แอดมินจะส่งรหัส VPN หลังตรวจ</p>
+    <div class="plan-grid" id="plans"></div>
+    <p class="err" id="err"></p>
+    <p class="ok" id="ok"></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/wallet-store.js"></script>
+  <script>
+    (function () {
+      var bal = 0;
+
+      async function refreshBal() {
+        var w = await Store.getWallet();
+        bal = Number(w.balance);
+        document.getElementById("balMini").textContent = "฿" + bal.toFixed(2);
+      }
+
+      function render() {
+        var box = document.getElementById("plans");
+        box.innerHTML = (Store.PLANS || []).map(function (p, i) {
+          return '<div class="plan' + (i === 1 ? " hot" : "") + '">' +
+            '<div class="name">' + p.label + (i === 1 ? " · แนะนำ" : "") + "</div>" +
+            '<div class="price">฿' + p.price + "</div>" +
+            '<div class="desc">' + p.desc + "</div>" +
+            '<button type="button" class="btn btn-primary btn-block" data-code="' + p.code +
+            '">ซื้อด้วยเครดิต</button></div>';
+        }).join("");
+
+        box.querySelectorAll("button[data-code]").forEach(function (btn) {
+          btn.onclick = async function () {
+            var err = document.getElementById("err");
+            var ok = document.getElementById("ok");
+            err.textContent = ""; ok.textContent = "";
+            if (!confirm("ยืนยันซื้อแพ็กนี้? จะตัดเครดิตทันที")) return;
+            btn.disabled = true;
+            try {
+              var res = await Store.buyPlan(btn.getAttribute("data-code"));
+              ok.textContent = "ซื้อสำเร็จ เครดิตเหลือ ฿" + Number(res.balance).toFixed(2);
+              await refreshBal();
+            } catch (ex) {
+              err.textContent = ex.message || "ไม่สำเร็จ";
+            } finally {
+              btn.disabled = false;
+            }
+          };
+        });
+      }
+
+      Store.getSession().then(async function (s) {
+        if (!s || !s.user) { location.href = "login.html"; return; }
+        await refreshBal();
+        render();
+      });
+    })();
+  </script>
+</body>
+</html>

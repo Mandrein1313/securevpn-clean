@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บัญชีของฉัน — SecureVPN</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .account-main { max-width: 900px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    .account-head {
+      display: flex; flex-wrap: wrap; gap: .75rem;
+      justify-content: space-between; align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .account-head h1 { font-size: 1.25rem; margin: 0; }
+    .order-list { display: grid; gap: .75rem; }
+    .order-item {
+      background: var(--card, #151b2d);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px; padding: 1rem;
+    }
+    .order-item h3 { margin: 0 0 .35rem; font-size: 1rem; }
+    .muted { color: var(--muted, #9aa3b5); font-size: .88rem; }
+    .badge {
+      display: inline-block; padding: .15rem .5rem; border-radius: 999px;
+      font-size: .75rem; background: #1e293b;
+    }
+    .empty { text-align: center; padding: 2rem; color: var(--muted, #9aa3b5); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="logo">Secure<span>VPN</span></a>
+      <nav class="nav-links">
+        <a href="index.html">หน้าแรก</a>
+        <a href="index.html#order">สั่งซื้อ</a>
+        <a href="account.html">บัญชีของฉัน</a>
+        <button type="button" class="btn btn-sm" id="btnLogout">ออกจากระบบ</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="account-main">
+    <div class="account-head">
+      <div>
+        <h1>บัญชีของฉัน</h1>
+        <p class="muted" id="userLabel">กำลังโหลด...</p>
+      </div>
+      <a class="btn" href="index.html#order">สั่งซื้อแพ็กเกจ</a>
+    </div>
+
+    <h2 style="font-size:1.05rem;margin-bottom:.75rem;">ออเดอร์ของคุณ</h2>
+    <div class="order-list" id="orderList">
+      <p class="empty">กำลังโหลด...</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script>
+    (function () {
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function label(st) {
+        return ({
+          pending: "รอชำระ",
+          paid: "ชำระแล้ว",
+          active: "เปิดใช้แล้ว",
+          suspended: "ระงับ",
+          cancelled: "ยกเลิก"
+        })[st] || st;
+      }
+      function fmt(ts) {
+        if (!ts) return "—";
+        return new Date(ts).toLocaleString("th-TH", {
+          dateStyle: "short",
+          timeStyle: "short"
+        });
+      }
+      // แสดงชื่อผู้ใช้จากอีเมลจำลอง
+      function displayName(user) {
+        if (!user) return "";
+        var meta = user.user_metadata || {};
+        if (meta.username) return meta.username;
+        if (meta.display_name) return meta.display_name;
+        var email = user.email || "";
+        var at = email.indexOf("@");
+        return at > 0 ? email.slice(0, at) : email;
+      }
+
+      async function boot() {
+        var session = await Store.getSession();
+        if (!session || !session.user) {
+          location.href = "login.html";
+          return;
+        }
+
+        document.getElementById("userLabel").textContent =
+          "สวัสดี, " + displayName(session.user);
+
+        document.getElementById("btnLogout").onclick = async function () {
+          await Store.logout();
+          location.href = "login.html";
+        };
+
+        try {
+          var list = await Store.listMyOrders();
+          var box = document.getElementById("orderList");
+          if (!list.length) {
+            box.innerHTML =
+              '<p class="empty">ยังไม่มีออเดอร์ — <a href="index.html#order">สั่งซื้อแพ็กเกจ</a></p>';
+            return;
+          }
+          box.innerHTML = list
+            .map(function (o) {
+              var cred = "";
+              if (o.status === "active" && (o.vpnUser || o.vpnPass)) {
+                cred =
+                  '<p class="muted" style="margin-top:.5rem">VPN: <code>' +
+                  esc(o.vpnUser) +
+                  "</code> / <code>" +
+                  esc(o.vpnPass) +
+                  "</code>" +
+                  (o.serverLabel ? " · " + esc(o.serverLabel) : "") +
+                  "</p>";
+              }
+              return (
+                '<article class="order-item"><h3>' +
+                esc(o.plan) +
+                ' <span class="badge">' +
+                esc(label(o.status)) +
+                "</span></h3>" +
+                '<p class="muted">' +
+                esc(o.id) +
+                " · " +
+                fmt(o.createdAt) +
+                "</p>" +
+                (o.note ? '<p class="muted">' + esc(o.note) + "</p>" : "") +
+                cred +
+                "</article>"
+              );
+            })
+            .join("");
+        } catch (e) {
+          document.getElementById("orderList").innerHTML =
+            '<p class="empty">' + esc(e.message) + "</p>";
+        }
+      }
+
+      boot().catch(function (e) {
+        document.getElementById("orderList").innerHTML =
+          '<p class="empty">' + esc(e.message || "โหลดไม่สำเร็จ") + "</p>";
+      });
+    })();
+  </script>
+</body>
+</html>

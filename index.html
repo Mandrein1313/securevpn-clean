@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureVPN — บริการ VPN สำหรับใช้งานส่วนตัว</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="index.html" class="logo">Secure<span>VPN</span></a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#features">จุดเด่น</a>
+        <a href="#plans">แพ็กเกจ</a>
+        <a href="#compliance">การปฏิบัติตามกฎหมาย</a>
+        <a href="#faq">คำถาม</a>
+        <a href="login.html">เข้าสู่ระบบ</a>
+        <a href="account.html">บัญชีของฉัน</a>
+        <a href="#order" class="btn btn-sm">สมัคร / สั่งซื้อ</a>
+      </nav>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="เมนู">☰</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <p class="badge">บริการเชื่อมต่อส่วนตัว · เก็บ Log ตามกฎหมายไทย</p>
+        <h1>VPN สำหรับงานและใช้งานส่วนตัว<br>โปร่งใส และมีเงื่อนไขชัดเจน</h1>
+        <p class="lead">
+          บริการเช่าการเข้าถึง VPN สำหรับลูกค้าที่ต้องการการเชื่อมต่อเข้ารหัสบนเครือข่ายสาธารณะ
+          ผู้ใช้ต้องยอมรับข้อตกลง และห้ามใช้เพื่อกิจกรรมที่ผิดกฎหมาย
+        </p>
+        <div class="hero-actions">
+          <a href="#plans" class="btn">ดูแพ็กเกจ</a>
+          <a href="tos.html" class="btn btn-outline">อ่านข้อตกลง</a>
+        </div>
+        <ul class="hero-points">
+          <li>เก็บ Traffic Log การเชื่อมต่ออย่างน้อย 90 วัน ตาม พ.ร.บ.คอมพิวเตอร์ฯ</li>
+          <li>มีข้อตกลงการใช้งาน (TOS) และนโยบายความเป็นส่วนตัว</li>
+          <li>รับชำระผ่านช่องทางที่ตรวจสอบย้อนกลับได้ (เช่น โอน / PromptPay)</li>
+        </ul>
+      </div>
+      <div class="hero-card">
+        <div class="status"><span class="dot"></span> พร้อมรับออเดอร์</div>
+        <h3>ก่อนสมัคร โปรดทราบ</h3>
+        <p style="color:var(--muted);font-size:0.92rem;margin-top:0.5rem;">
+          บริการนี้เป็นผู้ให้บริการเชื่อมต่อ มีหน้าที่เก็บ Log และให้ความร่วมมือกับเจ้าหน้าที่
+          เมื่อมีหนังสือราชการหรือคำสั่งที่ชอบด้วยกฎหมาย
+        </p>
+        <div class="notice-box">
+          ห้ามใช้บริการเพื่อเว็บพนัน โจมตีระบบ สแปม ละเมิดลิขสิทธิ์ หรือความผิดตาม พ.ร.บ.คอมพิวเตอร์ฯ
+          หากฝ่าฝืน ระงับบัญชีได้ทันทีโดยไม่คืนเงิน
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="container">
+      <h2>จุดเด่นของบริการ</h2>
+      <p class="section-desc">เน้นใช้งานส่วนตัวและความโปร่งใสด้านข้อตกลง ไม่ใช่การโฆษณา “ไม่เก็บ Log 100%” ซึ่งขัดกับหน้าที่ตามกฎหมายไทย</p>
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon">🔒</div>
+          <h3>การเชื่อมต่อเข้ารหัส</h3>
+          <p>ช่วยลดความเสี่ยงจากการดักข้อมูลบน Wi‑Fi สาธารณะ ตามขอบเขตทางเทคนิคของโปรโตคอลที่ใช้</p>
+        </article>
+        <article class="card">
+          <div class="icon">📋</div>
+          <h3>Log ตามกฎหมาย</h3>
+          <p>บันทึก IP ต้นทาง บัญชี เวลาเริ่ม–สิ้นสุด และปลายทางเซิร์ฟเวอร์/พอร์ต อย่างน้อย 90 วัน</p>
+        </article>
+        <article class="card">
+          <div class="icon">🛡️</div>
+          <h3>นโยบาย Abuse</h3>
+          <p>มีขั้นตอนรับเรื่องร้องเรียน ตรวจสอบบัญชี และระงับบริการเมื่อพบการใช้ผิดเงื่อนไข</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="plans" id="plans">
+    <div class="container">
+      <h2>แพ็กเกจตัวอย่าง</h2>
+      <p class="section-desc">ปรับราคาและรายละเอียดในไฟล์ได้ตามร้าน — หลังชำระจะได้รับบัญชีตามคู่มือที่ร้านกำหนด</p>
+      <div class="grid-3">
+        <article class="plan">
+          <h3>รายวัน</h3>
+          <p class="price"><span>฿19</span> / วัน</p>
+          <ul>
+            <li>1 อุปกรณ์</li>
+            <li>เซิร์ฟเวอร์พื้นฐาน</li>
+            <li>เหมาะทดลองใช้</li>
+          </ul>
+          <button type="button" class="btn btn-block" data-plan="รายวัน — ฿19">เลือกแพ็กนี้</button>
+        </article>
+        <article class="plan plan-hot">
+          <div class="tag">แนะนำ</div>
+          <h3>รายเดือน</h3>
+          <p class="price"><span>฿149</span> / เดือน</p>
+          <ul>
+            <li>สูงสุด 3 อุปกรณ์</li>
+            <li>หลายโลเคชัน (ตามที่ร้านเปิด)</li>
+            <li>ซัพพอร์ตช่วงเวลาทำการ</li>
+          </ul>
+          <button type="button" class="btn btn-block" data-plan="รายเดือน — ฿149">เลือกแพ็กนี้</button>
+        </article>
+        <article class="plan">
+          <h3>ราย 3 เดือน</h3>
+          <p class="price"><span>฿399</span> / 3 เดือน</p>
+          <ul>
+            <li>สูงสุด 5 อุปกรณ์</li>
+            <li>แพ็กประหยัด</li>
+            <li>เงื่อนไขเดียวกับ TOS</li>
+          </ul>
+          <button type="button" class="btn btn-block" data-plan="ราย 3 เดือน — ฿399">เลือกแพ็กนี้</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="compliance">
+    <div class="container legal-strip">
+      <h3>การปฏิบัติตามกฎหมาย (สรุป)</h3>
+      <p style="color:var(--muted);font-size:0.95rem;">
+        ผู้ให้บริการมีหน้าที่เก็บบันทึกข้อมูลการจราจรทางคอมพิวเตอร์ที่เกี่ยวข้องกับการเชื่อมต่อ
+        เป็นเวลาไม่น้อยกว่า 90 วัน ตามกรอบ พ.ร.บ.ว่าด้วยการกระทำความผิดเกี่ยวกับคอมพิวเตอร์
+        และประกาศ/แนวปฏิบัติที่เกี่ยวข้อง และจะส่งมอบ Log ที่เกี่ยวข้องเมื่อมีคำสั่งหรือหนังสือที่ชอบด้วยกฎหมาย
+      </p>
+      <ul>
+        <li>สิ่งที่เก็บ: IP ลูกค้าที่เชื่อมเข้า, บัญชีผู้ใช้, เวลาเริ่ม/สิ้นสุด, IP/พอร์ตฝั่งเซิร์ฟเวอร์ VPN</li>
+        <li>สิ่งที่ไม่เก็บเป็นเนื้อหา: ข้อความแชท, รหัสผ่านของเว็บปลายทาง, เนื้อหาการสื่อสาร</li>
+        <li>รายละเอียดเต็ม: <a href="tos.html">ข้อตกลงการใช้งาน</a> · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a> · <a href="aup.html">นโยบายการใช้ที่ยอมรับได้</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2>คำถามที่พบบ่อย</h2>
+      <details>
+        <summary>หลังโอนเงินแล้วได้อะไร?</summary>
+        <p>ได้รับข้อมูลบัญชี/วิธีติดตั้งตามแพ็กเกจ ภายในเวลาที่ร้านแจ้ง หลังตรวจสอบยอดและข้อมูลการติดต่อ</p>
+      </details>
+      <details>
+        <summary>ทำไมไม่ขายแบบ No-Log 100%?</summary>
+        <p>ผู้ให้บริการในประเทศไทยมีหน้าที่เก็บ Log การเชื่อมต่อตามกฎหมาย การโฆษณาว่าไม่เก็บอะไรเลยอาจขัดหน้าที่ตาม พ.ร.บ.คอมพิวเตอร์ฯ</p>
+      </details>
+      <details>
+        <summary>ถ้ามีเจ้าหน้าที่ขอข้อมูล?</summary>
+        <p>ร้านจะขอเอกสารราชการที่ระบุช่วงเวลาและความเกี่ยวข้อง แล้วส่งมอบ Log เฉพาะส่วนที่เกี่ยวข้องตามขั้นตอน</p>
+      </details>
+      <details>
+        <summary>ชำระเงินอย่างไร?</summary>
+        <p>แนะนำช่องทางที่ตรวจสอบย้อนกลับได้ เช่น โอนธนาคาร / PromptPay ตามที่ร้านประกาศหลังยืนยันออเดอร์</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="contact" id="order">
+    <div class="container contact-box">
+      <div>
+        <h2>สมัคร / สั่งซื้อ</h2>
+        <p style="color:var(--muted);margin-top:0.4rem;">
+          กรอกข้อมูลแล้วระบบจะบันทึกออเดอร์ (บนเบราว์เซอร์นี้) และสร้างข้อความให้คัดลอกไปแจ้งร้าน
+          ต้องยอมรับข้อตกลงก่อนส่ง
+        </p>
+        <ul class="contact-list">
+          <li>ใช้ข้อมูลติดต่อที่ติดต่อกลับได้จริง</li>
+          <li>ระบุอ้างอิงการโอนเมื่อชำระแล้ว</li>
+          <li>การสมัครถือว่ายอมรับ TOS / AUP / Privacy</li>
+        </ul>
+      </div>
+      <form id="orderForm" class="form">
+        <label>ชื่อหรือชื่อเล่น
+          <input type="text" name="name" required placeholder="ชื่อที่เรียกในแชท">
+        </label>
+        <label>ช่องทางติดต่อ (Line / Telegram)
+          <input type="text" name="contact" required placeholder="@line หรือ username">
+        </label>
+        <label>เบอร์โทร (แนะนำ — ช่วยยืนยันตัวตน)
+          <input type="tel" name="phone" placeholder="08x-xxx-xxxx">
+        </label>
+        <label>แพ็กเกจ
+          <select name="plan" id="planSelect">
+            <option value="รายวัน — ฿19">รายวัน — ฿19</option>
+            <option value="รายเดือน — ฿149" selected>รายเดือน — ฿149</option>
+            <option value="ราย 3 เดือน — ฿399">ราย 3 เดือน — ฿399</option>
+          </select>
+        </label>
+        <label>เลขอ้างอิงการโอน / หมายเหตุ
+          <textarea name="note" rows="2" placeholder="เช่น โอนแล้ว เวลา 12:30 / ใช้บน Android"></textarea>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" name="tos" id="tosCheck" required>
+          <span>ข้าพเจ้ายอมรับ <a href="tos.html" target="_blank">ข้อตกลงการใช้งาน</a>,
+            <a href="aup.html" target="_blank">นโยบายการใช้ที่ยอมรับได้</a> และ
+            <a href="privacy.html" target="_blank">นโยบายความเป็นส่วนตัว</a>
+            รวมถึงการเก็บ Log ตามกฎหมาย</span>
+        </label>
+        <button type="submit" class="btn btn-block">ส่งออเดอร์</button>
+        <p class="form-hint" id="formResult"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> SecureVPN — โปรเจกต์ตัวอย่างสำหรับผู้ให้บริการที่ต้องการโครงเว็บและหลังบ้าน</p>
+      <div class="footer-links">
+        <a href="tos.html">ข้อตกลง (TOS)</a>
+        <a href="privacy.html">ความเป็นส่วนตัว</a>
+        <a href="aup.html">การใช้ที่ยอมรับได้</a>
+        <a href="login.html">เข้าสู่ระบบ</a>
+        <a href="admin.html">หลังบ้าน</a>
+      </div>
+      <p class="fine">
+        ผู้ใช้ต้องปฏิบัติตามกฎหมายไทย ผู้ให้บริการสงวนสิทธิ์ระงับบัญชีเมื่อพบการใช้ผิดเงื่อนไข
+        หรือเมื่อได้รับแจ้ง Abuse ที่ตรวจสอบแล้ว
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

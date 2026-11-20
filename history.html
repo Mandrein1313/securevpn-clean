@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประวัติการซื้อ — SecureVPN</title>
+  <link rel="stylesheet" href="css/portal.css">
+</head>
+<body class="portal">
+  <div class="portal-wrap">
+    <div class="top-nav">
+      <a href="dashboard.html">← แดชบอร์ด</a>
+      <a href="packages.html">ซื้อแพ็ก</a>
+    </div>
+    <div class="page-title">🕐 ประวัติการซื้อ</div>
+    <div id="list"><p class="muted">กำลังโหลด...</p></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/wallet-store.js"></script>
+  <script>
+    (function () {
+      function esc(s) {
+        return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+      }
+      function fmt(ts) {
+        return ts ? new Date(Number(ts)).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" }) : "";
+      }
+      function badge(st) {
+        var map = { paid: "ชำระแล้ว", delivered: "ส่งรหัสแล้ว", cancelled: "ยกเลิก" };
+        return '<span class="badge ' + esc(st) + '">' + esc(map[st] || st) + "</span>";
+      }
+
+      async function boot() {
+        var s = await Store.getSession();
+        if (!s || !s.user) { location.href = "login.html"; return; }
+        var rows = await Store.listMyPurchases();
+        var box = document.getElementById("list");
+        if (!rows.length) {
+          box.innerHTML = '<p class="muted">ยังไม่มีรายการ — <a href="packages.html">ไปซื้อแพ็ก</a></p>';
+          return;
+        }
+        box.innerHTML = rows.map(function (r) {
+          var cred = "";
+          if (r.vpn_user || r.vpn_pass) {
+            cred = '<div class="muted" style="margin-top:.4rem">VPN: <code>' +
+              esc(r.vpn_user) + "</code> / <code>" + esc(r.vpn_pass) + "</code>" +
+              (r.server_label ? " · " + esc(r.server_label) : "") + "</div>";
+          }
+          return '<div class="list-item"><div class="row"><strong>' +
+            esc(r.plan_label || r.plan_code) + "</strong>" + badge(r.status) +
+            "</div><div class=\"muted\">฿" + Number(r.price).toFixed(2) +
+            " · " + fmt(r.created_at) + " · " + esc(r.id) + "</div>" + cred + "</div>";
+        }).join("");
+      }
+      boot().catch(function (e) {
+        document.getElementById("list").innerHTML = '<p class="err">' + e.message + "</p>";
+      });
+    })();
+  </script>
+</body>
+</html>

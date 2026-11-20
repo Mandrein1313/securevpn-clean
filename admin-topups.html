@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>อนุมัติเติมเงิน — Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    .tu-item { background:#151b2d; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:1rem; margin-bottom:.75rem; }
+    .tu-item .row { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:space-between; align-items:center; }
+    .tu-actions { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; }
+    .tu-actions input { flex:1; min-width:140px; padding:.45rem .6rem; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:#0d1220; color:#fff; }
+  </style>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container admin-nav">
+      <strong>SecureVPN Admin · เติมเงิน</strong>
+      <div class="admin-actions">
+        <a class="btn btn-sm" href="admin.html">← ออเดอร์</a>
+        <button type="button" class="btn btn-sm" id="btnOut">ออก</button>
+      </div>
+    </div>
+  </header>
+  <main class="container admin-main" style="padding:1rem">
+    <h2 style="font-size:1.1rem">คำขอเติมเงิน</h2>
+    <p class="muted" id="statusLine">กำลังโหลด...</p>
+    <div id="list"></div>
+    <h2 style="font-size:1.1rem;margin-top:1.5rem">การซื้อแพ็กล่าสุด</h2>
+    <div id="buys"></div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/wallet-store.js"></script>
+  <script>
+    (function () {
+      function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+      function fmt(ts){return ts?new Date(Number(ts)).toLocaleString("th-TH"):"";}
+
+      async function boot() {
+        var ok = await Store.isAdminSession();
+        if (!ok) { location.href = "admin.html"; return; }
+        document.getElementById("btnOut").onclick = async function(){ await Store.logout(); location.href="admin.html"; };
+
+        var topups = await Store.listAllTopups();
+        document.getElementById("statusLine").textContent = "ทั้งหมด " + topups.length + " รายการ";
+        var box = document.getElementById("list");
+        if (!topups.length) { box.innerHTML = "<p>ยังไม่มีคำขอ</p>"; }
+        else {
+          box.innerHTML = topups.map(function(t){
+            var actions = "";
+            if (t.status === "pending") {
+              actions = '<div class="tu-actions">' +
+                '<input type="text" placeholder="หมายเหตุแอดมิน" data-note="'+esc(t.id)+'">' +
+                '<button type="button" class="btn btn-sm" data-ok="'+esc(t.id)+">อนุมัติ</button>' +
+                '<button type="button" class="btn btn-sm" data-no="'+esc(t.id)+">ปฏิเสธ</button></div>";
+            }
+            return '<div class="tu-item"><div class="row"><strong>฿'+Number(t.amount).toFixed(2)+
+              '</strong><span>'+esc(t.status)+'</span></div>' +
+              '<div class="muted">'+esc(t.user_id)+'<br>'+esc(t.method)+' · '+esc(t.ref_code)+
+              ' · '+fmt(t.created_at)+'<br>'+esc(t.note)+'</div>'+actions+'</div>';
+          }).join("");
+
+          box.querySelectorAll("[data-ok]").forEach(function(btn){
+            btn.onclick = async function(){
+              var id = btn.getAttribute("data-ok");
+              var noteEl = box.querySelector('[data-note="'+id+'"]');
+              try {
+                await Store.approveTopup(id, noteEl ? noteEl.value : "");
+                alert("อนุมัติแล้ว"); boot();
+              } catch(e){ alert(e.message); }
+            };
+          });
+          box.querySelectorAll("[data-no]").forEach(function(btn){
+            btn.onclick = async function(){
+              var id = btn.getAttribute("data-no");
+              var noteEl = box.querySelector('[data-note="'+id+'"]');
+              try {
+                await Store.rejectTopup(id, noteEl ? noteEl.value : "");
+                alert("ปฏิเสธแล้ว"); boot();
+              } catch(e){ alert(e.message); }
+            };
+          });
+        }
+
+        var buys = await Store.listAllPurchases();
+        var bBox = document.getElementById("buys");
+        bBox.innerHTML = (buys||[]).slice(0,30).map(function(p){
+          return '<div class="tu-item"><div class="row"><strong>'+esc(p.plan_label)+
+            '</strong><span>'+esc(p.status)+'</span></div>' +
+            '<div class="muted">฿'+Number(p.price).toFixed(2)+' · '+esc(p.user_id)+' · '+fmt(p.created_at)+
+            '<br>VPN: '+esc(p.vpn_user)+' / '+esc(p.vpn_pass)+'</div>' +
+            '<div class="tu-actions">' +
+            '<input type="text" placeholder="vpn user" data-vu="'+esc(p.id)+'" value="'+esc(p.vpn_user)+'">' +
+            '<input type="text" placeholder="vpn pass" data-vp="'+esc(p.id)+'" value="'+esc(p.vpn_pass)+'">' +
+            '<button type="button" class="btn btn-sm" data-deliv="'+esc(p.id)+'">บันทึก+ส่งรหัส</button></div></div>';
+        }).join("") || "<p>ยังไม่มีการซื้อ</p>";
+
+        bBox.querySelectorAll("[data-deliv]").forEach(function(btn){
+          btn.onclick = async function(){
+            var id = btn.getAttribute("data-deliv");
+            var vu = bBox.querySelector('[data-vu="'+id+'"]');
+            var vp = bBox.querySelector('[data-vp="'+id+'"]');
+            try {
+              await Store.updatePurchase(id, {
+                status: "delivered",
+                vpnUser: vu ? vu.value : "",
+                vpnPass: vp ? vp.value : ""
+              });
+              alert("บันทึกแล้ว"); boot();
+            } catch(e){ alert(e.message); }
+          };
+        });
+      }
+      boot().catch(function(e){
+        document.getElementById("statusLine").textContent = e.message;
+      });
+    })();
+  </script>
+</body>
+</html>
