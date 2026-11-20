@@ -16,6 +16,7 @@
         <a href="#compliance">การปฏิบัติตามกฎหมาย</a>
         <a href="#faq">คำถาม</a>
         <a href="login.html">เข้าสู่ระบบ</a>
+        <a href="dashboard.html">แดชบอร์ด</a>
         <a href="account.html">บัญชีของฉัน</a>
         <a href="#order" class="btn btn-sm">สมัคร / สั่งซื้อ</a>
       </nav>
@@ -226,6 +227,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/wallet-store.js"></script>
+  <script>
+    // บังคับล็อกอินก่อนเข้าหน้าร้าน (เหมือนหลังบ้าน)
+    (async function () {
+      try {
+        var s = await Store.getSession();
+        if (!s || !s.user) {
+          location.replace("login.html?next=index.html");
+          return;
+        }
+      } catch (e) {
+        location.replace("login.html?next=index.html");
+        return;
+      }
+    })();
+  </script>
   <script src="js/main.js"></script>
 </body>
 </html>

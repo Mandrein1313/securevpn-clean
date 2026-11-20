@@ -132,13 +132,26 @@
   <script src="js/store.js"></script>
   <script>
     (function () {
-      // ชื่อผู้ใช้ → อีเมลจำลอง (ลูกค้าไม่ต้องกรอกอีเมล)
       var DOMAIN = "customer.securevpn.local";
+
       function toEmail(username) {
         return String(username || "").trim().toLowerCase() + "@" + DOMAIN;
       }
       function normalizeUser(u) {
         return String(u || "").trim().toLowerCase();
+      }
+
+      /** หน้าถัดไปหลังล็อกอิน — จาก ?next=index.html หรือค่าเริ่มต้น dashboard */
+      function nextPage() {
+        try {
+          var n = new URLSearchParams(location.search).get("next") || "dashboard.html";
+          if (/^[a-z0-9._-]+\.html$/i.test(n)) return n;
+        } catch (e) {}
+        return "dashboard.html";
+      }
+
+      function goNext() {
+        location.href = nextPage();
       }
 
       var mode = "login";
@@ -178,10 +191,10 @@
         if (saved) document.getElementById("username").value = saved;
       } catch (e) {}
 
-      // ล็อกอินอยู่แล้ว → ไปหน้าบัญชี
+      // ล็อกอินอยู่แล้ว → ไปหน้าถัดไป
       if (window.Store) {
         Store.getSession().then(function (s) {
-          if (s && s.user) location.href = "dashboard.html";
+          if (s && s.user) goNext();
         }).catch(function () {});
       }
 
@@ -224,20 +237,20 @@
 
             if (res.data.session) {
               ok.textContent = "สมัครสำเร็จ";
-              setTimeout(function () { location.href = "dashboard.html"; }, 500);
+              setTimeout(goNext, 500);
             } else {
               var loginTry = await sb.auth.signInWithPassword({ email: email, password: password });
               if (loginTry.error) {
                 ok.textContent = "สมัครแล้ว กรุณาเข้าสู่ระบบ";
                 setMode("login");
               } else {
-                location.href = "dashboard.html";
+                goNext();
               }
             }
           } else {
             var res2 = await sb.auth.signInWithPassword({ email: email, password: password });
             if (res2.error) throw res2.error;
-            location.href = "dashboard.html";
+            goNext();
           }
         } catch (ex) {
           var msg = ex.message || "ไม่สำเร็จ";
